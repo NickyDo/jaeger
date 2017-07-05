@@ -18,48 +18,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package builder
+package config
 
 import (
+	"github.com/olivere/elastic"
+	"github.com/pkg/errors"
 	"github.com/uber/jaeger/pkg/es"
-	escfg "github.com/uber/jaeger/pkg/es/config"
-	esDependencyStore "github.com/uber/jaeger/plugin/storage/es/dependencystore"
-	esSpanstore "github.com/uber/jaeger/plugin/storage/es/spanstore"
-	"github.com/uber/jaeger/storage/dependencystore"
-	"github.com/uber/jaeger/storage/spanstore"
-	"go.uber.org/zap"
 )
 
-type esBuilder struct {
-	logger        *zap.Logger
-	client        es.Client
-	configuration escfg.Configuration
+// Configuration describes the configuration properties needed to connect to a ElasticSearch cluster
+type Configuration struct {
+	Servers  []string
+	Username string
+	password string
+	Sniffer  bool
 }
 
-func newESBuilder(config *escfg.Configuration, logger *zap.Logger) *esBuilder {
-	return &esBuilder{
-		logger:        logger,
-		configuration: *config,
+// NewClient creates a new ElasticSearch client
+func (c *Configuration) NewClient() (es.Client, error) {
+	if len(c.Servers) < 1 {
+		return nil, errors.New("No servers specified")
 	}
-}
-
-func (e *esBuilder) getClient() (es.Client, error) {
-	if e.client == nil {
-		client, err := e.configuration.NewClient()
-		e.client = client
-		return e.client, err
-	}
-	return e.client, nil
-}
-
-func (e *esBuilder) NewSpanReader() (spanstore.Reader, error) {
-	client, err := e.getClient()
+	rawClient, err := elastic.NewClient(c.GetConfigs()...)
 	if err != nil {
 		return nil, err
 	}
-	return esSpanstore.NewSpanReader(client, e.logger), nil
+	return es.WrapESClient(rawClient), nil
 }
 
-func (e *esBuilder) NewDependencyReader() (dependencystore.Reader, error) {
-	return esDependencyStore.NewDependencyStore(), nil
+// GetConfigs wraps the configs to feed to the ElasticSearch client init
+func (c *Configuration) GetConfigs() []elastic.ClientOptionFunc {
+	var options []elastic.ClientOptionFunc
+	options = append(options, elastic.SetURL(c.Servers...))
+	options = append(options, elastic.SetBasicAuth(c.Username, c.password))
+	options = append(options, elastic.SetSniff(c.Sniffer))
+	return options
 }
