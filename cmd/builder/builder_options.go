@@ -32,15 +32,15 @@ import (
 // BasicOptions is a set of basic building blocks for most Jaeger executables
 type BasicOptions struct {
 	// Logger is a generic logger used by most executables
-	Logger         *zap.Logger
+	Logger *zap.Logger
 	// MetricsFactory is the basic metrics factory used by most executables
 	MetricsFactory metrics.Factory
 	// Cassandra is the cassandra configuration used by most executables (if applicable)
-	Cassandra      *config.Configuration
+	Cassandra *config.Configuration
 	// MemoryStore is the memory store (as reader and writer) that will be used if required
-	MemoryStore    *memory.Store
+	MemoryStore *memory.Store
 	// Elastic is the elasticsearch configuration used
-	ElasticSearch  *escfg.Configuration
+	ElasticSearch *escfg.Configuration
 }
 
 // Option is a function that sets some option on StorageBuilder.
@@ -77,7 +77,7 @@ func (BasicOptions) MemoryStoreOption(memoryStore *memory.Store) Option {
 	}
 }
 
-// ElasticSearcgOption creates an Option that adds ElasticSearch configuration.
+// ElasticSearchOption creates an Option that adds ElasticSearch configuration.
 func (BasicOptions) ElasticSearchOption(elastic *escfg.Configuration) Option {
 	return func(b *BasicOptions) {
 		b.ElasticSearch = elastic
