@@ -36,7 +36,7 @@ func TestApplyOptions(t *testing.T) {
 		Options.LoggerOption(zap.NewNop()),
 		Options.MetricsFactoryOption(metrics.NullFactory),
 		Options.MemoryStoreOption(memory.NewStore()),
-		Options.ElasticOption(nil),
+		Options.ElasticSearchOption(nil),
 	)
 	assert.NotNil(t, opts.Logger)
 	assert.NotNil(t, opts.MetricsFactory)

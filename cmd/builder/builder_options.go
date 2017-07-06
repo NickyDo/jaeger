@@ -21,25 +21,26 @@
 package builder
 
 import (
+	"go.uber.org/zap"
+
 	"github.com/uber/jaeger-lib/metrics"
 	"github.com/uber/jaeger/pkg/cassandra/config"
 	escfg "github.com/uber/jaeger/pkg/es/config"
 	"github.com/uber/jaeger/storage/spanstore/memory"
-	"go.uber.org/zap"
 )
 
 // BasicOptions is a set of basic building blocks for most Jaeger executables
 type BasicOptions struct {
 	// Logger is a generic logger used by most executables
-	Logger *zap.Logger
+	Logger         *zap.Logger
 	// MetricsFactory is the basic metrics factory used by most executables
 	MetricsFactory metrics.Factory
 	// Cassandra is the cassandra configuration used by most executables (if applicable)
-	Cassandra *config.Configuration
+	Cassandra      *config.Configuration
 	// MemoryStore is the memory store (as reader and writer) that will be used if required
-	MemoryStore *memory.Store
+	MemoryStore    *memory.Store
 	// Elastic is the elasticsearch configuration used
-	Elastic *escfg.Configuration
+	ElasticSearch  *escfg.Configuration
 }
 
 // Option is a function that sets some option on StorageBuilder.
@@ -76,10 +77,10 @@ func (BasicOptions) MemoryStoreOption(memoryStore *memory.Store) Option {
 	}
 }
 
-// ElasticOption creates an Option that adds ElasticSearch configuration.
-func (BasicOptions) ElasticOption(elastic *escfg.Configuration) Option {
+// ElasticSearcgOption creates an Option that adds ElasticSearch configuration.
+func (BasicOptions) ElasticSearchOption(elastic *escfg.Configuration) Option {
 	return func(b *BasicOptions) {
-		b.Elastic = elastic
+		b.ElasticSearch = elastic
 	}
 }
 

@@ -23,15 +23,16 @@ package config
 import (
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
+
 	"github.com/uber/jaeger/pkg/es"
 )
 
 // Configuration describes the configuration properties needed to connect to a ElasticSearch cluster
 type Configuration struct {
 	Servers  []string
-	Username string
+	username string
 	password string
-	Sniffer  bool
+	sniffer  bool
 }
 
 // NewClient creates a new ElasticSearch client
@@ -48,9 +49,9 @@ func (c *Configuration) NewClient() (es.Client, error) {
 
 // GetConfigs wraps the configs to feed to the ElasticSearch client init
 func (c *Configuration) GetConfigs() []elastic.ClientOptionFunc {
-	var options []elastic.ClientOptionFunc
+	options := make([]elastic.ClientOptionFunc, 3)
 	options = append(options, elastic.SetURL(c.Servers...))
-	options = append(options, elastic.SetBasicAuth(c.Username, c.password))
-	options = append(options, elastic.SetSniff(c.Sniffer))
+	options = append(options, elastic.SetBasicAuth(c.username, c.password))
+	options = append(options, elastic.SetSniff(c.sniffer))
 	return options
 }
